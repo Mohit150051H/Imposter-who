@@ -1,0 +1,46 @@
+name: Build Flet APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # This allows you to click a button to run it manually
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Flet
+        run: |
+          pip install flet
+          # If you used other libraries, uncomment the next line:
+          # pip install -r requirements.txt
+
+      - name: Setup Java (Required for Android)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build APK
+        run: |
+          flet build apk --verbose
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImposterGame-APK
+          path: build/apk/build/app/outputs/flutter-apk/app-release.apk
